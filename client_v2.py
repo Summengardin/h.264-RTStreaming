@@ -17,7 +17,8 @@ def sigint_handler(signal, frame):
 def client():
     # Connect to server
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8485))
+    IPAddr = '10.19.127.11'
+    client_socket.connect((IPAddr, 8485))
     print(f"Connecting to server at ip: {client_socket.getsockname()[0]}, port: {client_socket.getsockname()[1]}")
 
     # Make a file-like object out of the connection
@@ -37,9 +38,7 @@ def client():
             
             packets = codec.parse(data)
 
-            
-
-            
+             
             for packet in packets:
                 frames = codec.decode(packet)
                 if frames:
@@ -49,8 +48,9 @@ def client():
                     fpsCounter += 1
                     elapsedTime = time.time() - startTime
 
-                    if elapsedTime >= 1.0:
-                        fps = fpsCounter / elapsedTime
+                    update_rate = 1 #seconds
+                    if elapsedTime >= update_rate:
+                        fps = fpsCounter / (elapsedTime * (1/update_rate))
                         fps = f"{fps:.2f}"
                         fpsCounter = 0
                         startTime = time.time()

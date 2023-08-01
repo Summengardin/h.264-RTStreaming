@@ -41,7 +41,7 @@ def main():
     # Preview
     xout_preview = pipeline.create(dai.node.XLinkOut)
     xout_preview.setStreamName("preview")
-    camRgb.preview.link(xout_preview.input)
+    camRgb.video.link(xout_preview.input)
 
 
     codec = av.CodecContext.create("h264", "r")

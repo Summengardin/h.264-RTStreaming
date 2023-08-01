@@ -17,10 +17,15 @@ def server():
     pipeline = dai.Pipeline()
 
     camRgb = pipeline.create(dai.node.ColorCamera)
-    camRgb.initialControl.AutoFocusMode(dai.CameraControl.AutoFocusMode.AUTO)
+    
+    camRgb.initialControl.setAutoFocusMode(dai.CameraControl.AutoFocusMode.OFF)
+    camRgb.initialControl.setAntiBandingMode(dai.CameraControl.AntiBandingMode.OFF)
+    camRgb.initialControl.setAutoWhiteBalanceMode(dai.CameraControl.AutoWhiteBalanceMode.OFF)
+    camRgb.initialControl.setAutoExposureLock(True)
     camRgb.setBoardSocket(dai.CameraBoardSocket.RGB)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-    camRgb.initialControl.setAutoExposureLock(True)
+    camRgb.setVideoSize(1280, 720)
+    camRgb.setFps(20)
 
 
     videoEnc = pipeline.create(dai.node.VideoEncoder)
@@ -39,7 +44,9 @@ def server():
             # Setup server socket
             print("Setting up server socket...")
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.bind(('localhost', 8485))
+            #IPAddr = 'localhost'
+            IPAddr = '10.19.127.11'
+            server_socket.bind((IPAddr, 8485))
             server_socket.listen(0)
             print(f"Socket setup at ip: {server_socket.getsockname()[0]}, port:  {server_socket.getsockname()[1]}\n")
 
@@ -53,6 +60,8 @@ def server():
 
             while True:
                 data = q.get().getData()  # Blocking call, will wait until new data has arrived
+                print(camRgb.getFps())
+                
                 # write the length of the data and then the data itself
                 connection.write(struct.pack('<L', len(data)) + bytes(data))
     finally:
